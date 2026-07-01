@@ -39,7 +39,7 @@ class GeneralCommands(commands.Cog):
         # Создаём Embed
         embed = discord.Embed(
             title="🗺️ Ротация карт Apex Legends",
-            color=discord.Color.gold()
+            color=discord.Color.red()
         )
 
         # Блок с текущей картой
