@@ -36,51 +36,59 @@ class GeneralCommands(commands.Cog):
         current = mode.get('current', {})
         next_map = mode.get('next', {})
 
-        # Создаём Embed
-        embed = discord.Embed(
-            title="🗺️ Ротация карт Apex Legends",
-            color=discord.Color.red()
-        )
 
-        # Блок с текущей картой
-        embed.add_field(
-            name="🟢 Текущая карта",
-            value=(
-                f"**Карта:** {current.get('map', 'Неизвестно')}\n"
-                f"**🕐 Начало в:** {current.get('readableDate_start', 'N/A')}\n"
-                f"**🕐 Конец в **{current.get('readableDate_end', 'N/A')}\n"
-                f"**⏳ Осталось:** {current.get('remainingTimer', 'N/A')}\n"
-                f"**⏱️ Длительность:** {current.get('DurationInMinutes', '?')/60} ч."
-            ),
+        asset_url = current.get('asset')  # может быть None
+
+        # ---- Embed 1: текущая карта с баннером ----
+        embed_current = discord.Embed(
+            title="🟢 Текущая карта",
+            color=discord.Color.green()
+        )
+        embed_current.add_field(
+            name="Карта",
+            value=current.get('map', 'Неизвестно'),
             inline=False
         )
-
-        # Блок со следующей картой
-        embed.add_field(
-            name="🔜 Следующая карта",
-            value=(
-                f"**Карта:** {next_map.get('map', 'Неизвестно')}\n"
-                f"**🕐 Начало в:** {next_map.get('readableDate_start', 'N/A')}\n"
-                f"**🕐 Конец в **{next_map.get('readableDate_end', 'N/A')}\n"
-                f"**⏱️ Длительность:** {next_map.get('DurationInMinutes', '?')/60} ч."
-            ),
-            inline=False
+        embed_current.add_field(
+            name="⏳ Осталось",
+            value=current.get('remainingTimer', 'N/A'),
+            inline=True
         )
-
-        # Устанавливаем иконку текущей карты (справа сверху)
-        asset_url = current.get('asset')
+        embed_current.add_field(
+            name="⏱️ Длительность",
+            value=f"{current.get('DurationInMinutes', '?')} мин.",
+            inline=True
+        )
+        # Широкий баннер внизу
         if asset_url:
-            embed.set_thumbnail(url=asset_url)
+            embed_current.set_image(url=asset_url)
 
-        embed.set_footer(text="Данные от ApexLegendsStatus.com")
+        # ---- Embed 2: следующая карта с баннером (используем ту же картинку) ----
+        embed_next = discord.Embed(
+            title="🔜 Следующая карта",
+            color=discord.Color.blue()
+        )
+        embed_next.add_field(
+            name="Карта",
+            value=next_map.get('map', 'Неизвестно'),
+            inline=False
+        )
+        embed_next.add_field(
+            name="🕐 Начало в",
+            value=next_map.get('readableDate_start', 'N/A'),
+            inline=True
+        )
+        embed_next.add_field(
+            name="⏱️ Длительность",
+            value=f"{next_map.get('DurationInMinutes', '?')} мин.",
+            inline=True
+        )
+        # Тот же баннер для второго Embed
+        if asset_url:
+            embed_next.set_image(url=asset_url)
 
-        await ctx.send(embed=embed)
-
-
-    @commands.command()
-    async def random(self, ctx, max_value: int):
-        number = r.randint(1, max_value)
-        await ctx.send(f"Случайное число от 1 до {max_value}: \n **{number}**")
+        # Отправляем оба Embed в одном сообщении
+        await ctx.send(embeds=[embed_current, embed_next])
 
 
 async def setup(bot):
