@@ -4,6 +4,7 @@ from discord.ext import commands
 import aiohttp
 from config.settings import tokenApex
 
+
 class GeneralCommands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -35,9 +36,16 @@ class GeneralCommands(commands.Cog):
         mode = data.get('ranked', {})
         current = mode.get('current', {})
         next_map = mode.get('next', {})
-
-
-        asset_url = current.get('asset')  # может быть None
+        #Current maP
+        DurationInMinutes = current.get('DurationInMinutes', '?')
+        hours = DurationInMinutes // 60
+        minutes = DurationInMinutes % 60 
+        #New maP
+        nDurationInMinutes = next_map.get('DurationInMinutes', '?')
+        nhours = nDurationInMinutes // 60
+        nminutes = nDurationInMinutes % 60
+        asset_url = current.get('asset')
+        nasset_url = next_map.get("asset")  # может быть None
 
         # ---- Embed 1: текущая карта с баннером ----
         embed_current = discord.Embed(
@@ -56,7 +64,7 @@ class GeneralCommands(commands.Cog):
         )
         embed_current.add_field(
             name="⏱️ Длительность",
-            value=f"{current.get('DurationInMinutes', '?')} мин.",
+            value=f"{hours} ч. {minutes} мин.",
             inline=True
         )
         # Широкий баннер внизу
@@ -80,12 +88,12 @@ class GeneralCommands(commands.Cog):
         )
         embed_next.add_field(
             name="⏱️ Длительность",
-            value=f"{next_map.get('DurationInMinutes', '?')} мин.",
+            value=f"{nhours} ч. {nminutes} мин.",
             inline=True
         )
         # Тот же баннер для второго Embed
-        if asset_url:
-            embed_next.set_image(url=asset_url)
+        if nasset_url:
+            embed_next.set_image(url=nasset_url)
 
         # Отправляем оба Embed в одном сообщении
         await ctx.send(embeds=[embed_current, embed_next])
