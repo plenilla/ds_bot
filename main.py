@@ -14,7 +14,7 @@ async def main():
 
 @bot.event
 async def on_ready():
-    print(f'We have logged in as {bot.user}')
+    print(f'{bot.user} Ботиак запущен')
 
 @bot.event
 async def on_message(message):
